@@ -1,0 +1,5 @@
+name: ba
+N: 4 # number of series
+n: 12 # number of total nodes
+m: 5 # Number of edges to attach from a new node to existing nodes
+seed: 123

@@ -1,0 +1,5 @@
+pyyaml==6.0.2
+easydict==1.13
+colorama==0.4.6
+pyemd==1.0.0
+pandas==1.5.2
