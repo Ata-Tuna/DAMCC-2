@@ -8,8 +8,8 @@ class CCEmbedder(nn.Module):
 
         # Define input, intermediate, and final channel dimensions
         in_channels = [feature_n_0_cells, feature_n_1_cells, feature_n_2_cells]  # [7, 11, 13]
-        intermediate_channels = [60, 60, 60]  # Custom intermediate channels
-        final_channels = [60, 256, 256]  # Final channels with embedding dimension of 256 for x_2
+        intermediate_channels = [2, 2, 2]  # Custom intermediate channels
+        final_channels = [2, 2, 2]  # Final channels with embedding dimension of 256 for x_2
 
         # Channels per layer configuration
         channels_per_layer = [
@@ -17,8 +17,8 @@ class CCEmbedder(nn.Module):
         ]
 
         self.hmc = HMC(channels_per_layer)
-        self.fc_0 = nn.Linear(60, embedding_dim)  # Projecting node embeddings to 256 dimensions
-        self.fc_1 = nn.Linear(60, embedding_dim)  # Projecting edge embeddings to 256 dimensions
+        self.fc_0 = nn.Linear(2, embedding_dim)  # Projecting node embeddings to 256 dimensions
+        self.fc_1 = nn.Linear(2, embedding_dim)  # Projecting edge embeddings to 256 dimensions
 
     def to_sparse(self, tensor):
         return tensor.to_sparse()

@@ -5,9 +5,10 @@ import pickle
 import shutil
 from datetime import datetime
 from config import parse_arguments
-from train import train_model, validate_model, save_training_state
-from test import test_model
+from train_model import train_model, validate_model, save_training_state
+from test_model import test_model
 from damcc import Damcc
+from toy_model import ToyModel
 from loss_functions import sinkhorn_cosine_loss, wasserstein_l2_loss
 from utils.process_graph_to_cc import CCDataset
 import torch.optim as optim
@@ -59,23 +60,12 @@ n_features = len(train_data.x_0[0][1]) if args.train else len(test_data.x_0[0][1
 feature_n_0_cells = len(train_data.x_0[0][1]) if args.train else len(test_data.x_0[0][1])
 feature_n_1_cells = 1
 feature_n_2_cells = 1
-
-# # Validate sequential containment of 1-skeleta: verify that each consecutive complex's 1-skeleton
-# # contains its predecessor's 1-skeleton to ensure data integrity and proper index preservation
-# for i in range(1, len(train_data.complexes)):
-#     # prev_skeleton = set(train_data.complexes[i-1].skeleton(1))
-#     # curr_skeleton = set(train_data.complexes[i].skeleton(1))
-#     # if not prev_skeleton.issubset(curr_skeleton):
-#     #     print(f"At index {i}, previous skeleton(1) is not contained in current skeleton(1).")
-#     #     print(f"Prev: {prev_skeleton}")
-#     #     print(f"Curr: {curr_skeleton}")
-#     print(train_data.b1[i].to_dense())
-# sys.exit()
-size_g = 256
+size_g = 2
 
 
 # Initialize model and optimizer
-model = Damcc(num_nodes, n_features, size_g, feature_n_0_cells, feature_n_1_cells, feature_n_2_cells, new_cell_factor = 1.5).to(device)
+# model = Damcc(num_nodes, n_features, size_g, feature_n_0_cells, feature_n_1_cells, feature_n_2_cells, new_cell_factor = 1.5).to(device)
+model = ToyModel(num_nodes, n_features, size_g, feature_n_0_cells, feature_n_1_cells, feature_n_2_cells, new_cell_factor = 1.5).to(device)
 optimizer = optim.Adam(model.parameters(), lr=args.lr)
 loss_function = sinkhorn_cosine_loss
 
@@ -85,7 +75,9 @@ lr_reduction_counter = 0
 lr_reduction_patience = 10  # Reduce LR if no improvement after 10 epochs
 early_stop_patience = 20    # Stop training if no improvement after 20 epochs
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=lr_reduction_patience, factor=0.5, verbose=True)
-one_cells_weight = 0.5
+one_cells_weight = 1
+
+
 
 # Execute Training or Testing
 if args.train:

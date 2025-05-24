@@ -21,17 +21,17 @@ class AutoregressiveSubsetSampler(nn.Module):
 
         # MLP for processing m and g
         self.mlp_mg = nn.Sequential(
-            nn.Linear(size_g + size_g, 512),
+            nn.Linear(size_g + size_g, 2),
             nn.ReLU(),
-            nn.Linear(512, 256)
+            nn.Linear(2, 2)
         )
 
         # SampleRow module
-        self.sample_row = SampleRow(256, n, size_g, self.leaf_prob, self.left_prob, self.right_prob, 
+        self.sample_row = SampleRow(2, n, size_g, self.leaf_prob, self.left_prob, self.right_prob, 
                                     min_nonzero=self.min_nonzero, max_nonzero=self.max_nonzero)
 
         # Transformer for processing g
-        self.transformer = nn.TransformerEncoderLayer(d_model=size_g, nhead=8)
+        self.transformer = nn.TransformerEncoderLayer(d_model=size_g, nhead=1)
 
     def forward(self, gnn_embeds, b):
         num_nodes = gnn_embeds.size(0)
@@ -74,6 +74,7 @@ class AutoregressiveSubsetSampler(nn.Module):
 
 
         print("RETURNING INCIDENCE MATRIX")
+        print(incidence_matrix)
         print("incidence matrix size was: ", b.size(0))
         print("new size: ", incidence_matrix.size(0))
         return incidence_matrix
