@@ -379,12 +379,13 @@ def row_wise_permutation_invariant_loss(tensor1, tensor2):
     tensor1 = tensor1.float()
     tensor2 = tensor2.float()
 
-    # Compute pairwise BCE loss
-    tensor1_expanded = tensor1.unsqueeze(1).expand(-1, n_row2, -1)  # Shape: [n_row1, n_row2, d]
-    tensor2_expanded = tensor2.unsqueeze(0).expand(n_row1, -1, -1)  # Shape: [n_row1, n_row2, d]
+    # Pad tensors with zeros to match the number of rows
+    max_rows = max(n_row1, n_row2)
+    tensor1_padded = pad_with_zeros(tensor1, max_rows)
+    tensor2_padded = pad_with_zeros(tensor2, max_rows)
     
     # Vectorized pairwise BCE computation
-    pairwise_bce_distances = F.binary_cross_entropy(tensor1_expanded, tensor2_expanded, reduction='none').mean(dim=2)
+    pairwise_bce_distances = F.binary_cross_entropy(tensor1_padded, tensor2_padded, reduction='none').mean(dim=2)
 
     # Apply the Hungarian algorithm to find the optimal row matching
     row_idx, col_idx = linear_sum_assignment(pairwise_bce_distances.cpu().detach().numpy())
