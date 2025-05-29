@@ -15,9 +15,9 @@ def ensure_nonzero_dim(tensor, axis=0):
         shape[axis] = 1  # Set the 0-dimension to 1
 
         if axis == 0:
-            zero_tensor = torch.zeros(1, shape[1], dtype=tensor.dtype).to_sparse()
+            zero_tensor = torch.zeros(1, shape[1], dtype=tensor.dtype)
         else:
-            zero_tensor = torch.zeros(shape[0], 1, dtype=tensor.dtype).to_sparse()
+            zero_tensor = torch.zeros(shape[0], 1, dtype=tensor.dtype)
 
         tensor = torch.cat([tensor, zero_tensor], dim=axis)
     
@@ -158,12 +158,12 @@ class CCDataset(Dataset):
             target_cob01seq = []
             target_cob02seq = []
             for cc in cc_seq:
-                a01 = torch.from_numpy(cc.adjacency_matrix(0, 1).todense()).to_sparse()
+                a01 = torch.from_numpy(cc.adjacency_matrix(0, 1).todense())
                 a01 = ensure_nonzero_dim(a01, axis=0)
                 a01 = ensure_nonzero_dim(a01, axis=1)
                 a01seq.append(a01)
 
-                a02 = torch.from_numpy(cc.adjacency_matrix(1, 2).todense()).to_sparse()
+                a02 = torch.from_numpy(cc.adjacency_matrix(1, 2).todense())
                 a02 = ensure_nonzero_dim(a02, axis=0)
                 a02 = ensure_nonzero_dim(a02, axis=1)
                 a02seq.append(a02)
@@ -171,27 +171,27 @@ class CCDataset(Dataset):
                 B = cc.incidence_matrix(rank=1, to_rank=2)
                 A = B.T @ B
                 A.setdiag(0)
-                coa2 = torch.from_numpy(A.todense()).to_sparse()
+                coa2 = torch.from_numpy(A.todense())
                 coa2 = ensure_nonzero_dim(coa2, axis=0)
                 coa2 = ensure_nonzero_dim(coa2, axis=1)
                 coa2seq.append(coa2)
 
-                b1 = torch.from_numpy(cc.incidence_matrix(0, 1).todense()).to_sparse()
+                b1 = torch.from_numpy(cc.incidence_matrix(0, 1).todense())
                 b1 = ensure_nonzero_dim(b1, axis=0)
                 b1 = ensure_nonzero_dim(b1, axis=1)
                 b1seq.append(b1)
 
-                b2 = torch.from_numpy(cc.incidence_matrix(1, 2).todense()).to_sparse()
+                b2 = torch.from_numpy(cc.incidence_matrix(1, 2).todense())
                 b2 = ensure_nonzero_dim(b2, axis=0)
                 b2 = ensure_nonzero_dim(b2, axis=1)
                 b2seq.append(b2)
 
-                cob01 = torch.from_numpy(cc.incidence_matrix(0, 1).todense().T).to_sparse()
+                cob01 = torch.from_numpy(cc.incidence_matrix(0, 1).todense().T)
                 cob01 = ensure_nonzero_dim(cob01, axis=0)
                 cob01 = ensure_nonzero_dim(cob01, axis=1)
                 cob01seq.append(cob01)
 
-                cob02 = torch.from_numpy(cc.incidence_matrix(0, 2).todense().T).to_sparse()
+                cob02 = torch.from_numpy(cc.incidence_matrix(0, 2).todense().T)
                 cob02 = ensure_nonzero_dim(cob02, axis=0)
                 cob02 = ensure_nonzero_dim(cob02, axis=1)
                 cob02seq.append(cob02)

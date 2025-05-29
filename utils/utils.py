@@ -3,12 +3,14 @@ import toponetx as tnx
 import numpy as np
 import torch
 import pickle
+import json
+import matplotlib.pyplot as plt
 
 def to_device(tensor, device):
     return tensor.to(device)
 
 
-def incidence_matrix_to_graph(incidence_matrix):
+def incidence_matrix_to_graph(incidence_matrix, threshold=0.5):
     """
     Converts a transposed incidence matrix to a NetworkX graph.
 
@@ -19,13 +21,18 @@ def incidence_matrix_to_graph(incidence_matrix):
     Returns:
     - G (nx.Graph): A NetworkX graph constructed from the incidence matrix.
     """
+
     # Ensure the incidence matrix is a dense matrix
     if isinstance(incidence_matrix, torch.Tensor):
         incidence_matrix = incidence_matrix.to_dense() if incidence_matrix.is_sparse else incidence_matrix
-        incidence_matrix = incidence_matrix.numpy()
-    
+        incidence_matrix = (incidence_matrix.numpy() > threshold).astype(int)
+        print("incidence_matrix: ", incidence_matrix)
+
+    if isinstance(incidence_matrix, np.ndarray):
+        incidence_matrix = (incidence_matrix > threshold).astype(int)
     # Number of edges (rows) and nodes (columns)
     m, n = incidence_matrix.shape
+
 
     # Initialize an undirected graph
     G = nx.Graph()
@@ -106,8 +113,6 @@ def divide_tensors_into_lists(list_of_lists, list_of_tensors):
     """
     # Get the length of the first inner list in list_of_lists
     inner_list_length = len(list_of_lists[0])
-    print("inner_list_length: ",inner_list_length)
-    print("list_of_tensors: ",len(list_of_tensors))
     # Check if the total number of tensors is divisible by the inner list length
     if len(list_of_tensors) % inner_list_length != 0:
         raise ValueError("The number of tensors in list_of_tensors must be divisible by the length of the inner lists in list_of_lists.")
@@ -167,8 +172,35 @@ def load_pickle(path):
     return data
 
 
-
+def hard_sigmoid(x, temperature=0.1):
+    return torch.sigmoid(x / temperature)
 # Example usage:
 # incidence_0_1_T = torch.tensor(...)  # Transposed incidence matrix for edges
 # incidence_0_2_T = torch.tensor(...)  # Transposed incidence matrix for faces
 # cc = generate_cc_from_transposed_incidence(incidence_0_1_T, incidence_0_2_T)
+
+def plot_epoch_losses(path_to_json = "../experiments/last_experiment/epoch_losses.json"):
+    # Read the epoch losses from the JSON file (one JSON object per line)
+    train_losses = []
+    val_losses = []
+    epochs = []
+
+    with open(path_to_json, "r") as f:
+        for line in f:
+            record = json.loads(line)
+            if record["train_loss"] is not None:
+                train_losses.append(record["train_loss"])
+            else:
+                train_losses.append(float('nan'))
+            val_losses.append(record["val_loss"])
+            epochs.append(record["epoch"])
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(epochs, train_losses, label="Train Loss")
+    plt.plot(epochs, val_losses, label="Validation Loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Training and Validation Loss per Epoch")
+    plt.legend()
+    plt.grid(True)
+    plt.show()

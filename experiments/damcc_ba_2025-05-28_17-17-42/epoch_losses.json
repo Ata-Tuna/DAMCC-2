@@ -1,0 +1,16 @@
+{"epoch": 0, "train_loss": null, "val_loss": 2.3365979194641113, "best_epoch": 0, "best_val_loss": 2.3365979194641113}
+{"epoch": 1, "train_loss": 2.3262338439623513, "val_loss": 2.324095884958903, "best_epoch": 1, "best_val_loss": 2.324095884958903}
+{"epoch": 2, "train_loss": 2.2733696897824607, "val_loss": 2.1647898157437644, "best_epoch": 2, "best_val_loss": 2.1647898157437644}
+{"epoch": 3, "train_loss": 2.042752265930176, "val_loss": 1.9331399003664653, "best_epoch": 3, "best_val_loss": 1.9331399003664653}
+{"epoch": 4, "train_loss": 1.8722363114356995, "val_loss": 1.841459055741628, "best_epoch": 4, "best_val_loss": 1.841459055741628}
+{"epoch": 5, "train_loss": 1.8227340976397197, "val_loss": 1.8319618900616963, "best_epoch": 5, "best_val_loss": 1.8319618900616963}
+{"epoch": 6, "train_loss": 1.815281520287196, "val_loss": 1.824299971262614, "best_epoch": 6, "best_val_loss": 1.824299971262614}
+{"epoch": 7, "train_loss": 1.8083711663881938, "val_loss": 1.820868730545044, "best_epoch": 7, "best_val_loss": 1.820868730545044}
+{"epoch": 8, "train_loss": 1.7901703615983326, "val_loss": 1.7634831468264263, "best_epoch": 8, "best_val_loss": 1.7634831468264263}
+{"epoch": 9, "train_loss": 1.7430363098780315, "val_loss": 1.757696310679118, "best_epoch": 9, "best_val_loss": 1.757696310679118}
+{"epoch": 10, "train_loss": 1.7446986834208171, "val_loss": 1.7617013653119404, "best_epoch": 9, "best_val_loss": 1.757696310679118}
+{"epoch": 11, "train_loss": 1.741738498210907, "val_loss": 1.7550114393234253, "best_epoch": 11, "best_val_loss": 1.7550114393234253}
+{"epoch": 12, "train_loss": 1.737176090478897, "val_loss": 1.7296695907910664, "best_epoch": 12, "best_val_loss": 1.7296695907910664}
+{"epoch": 13, "train_loss": 1.6760109066963196, "val_loss": 1.6581392884254456, "best_epoch": 13, "best_val_loss": 1.6581392884254456}
+{"epoch": 14, "train_loss": 1.6628800829251607, "val_loss": 1.6597758928934734, "best_epoch": 13, "best_val_loss": 1.6581392884254456}
+{"epoch": 15, "train_loss": 1.6659830212593079, "val_loss": 1.6575942635536194, "best_epoch": 15, "best_val_loss": 1.6575942635536194}

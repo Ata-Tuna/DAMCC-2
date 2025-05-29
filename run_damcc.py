@@ -8,8 +8,8 @@ from config import parse_arguments
 from train_model import train_model, validate_model, save_training_state
 from test_model import test_model
 from damcc import Damcc
-from toy_model import ToyModel
-from loss_functions import sinkhorn_cosine_loss, wasserstein_l2_loss
+from toy_model_simple import ToyModel
+from loss_functions import get_composite_loss
 from utils.process_graph_to_cc import CCDataset
 import torch.optim as optim
 
@@ -67,7 +67,16 @@ size_g = 2
 # model = Damcc(num_nodes, n_features, size_g, feature_n_0_cells, feature_n_1_cells, feature_n_2_cells, new_cell_factor = 1.5).to(device)
 model = ToyModel(num_nodes, n_features, size_g, feature_n_0_cells, feature_n_1_cells, feature_n_2_cells, new_cell_factor = 1.5).to(device)
 optimizer = optim.Adam(model.parameters(), lr=args.lr)
-loss_function = sinkhorn_cosine_loss
+
+# alpha = 1 # Weight for the sparsity penalty
+# beta = 1.2  # Weight for the uniqueness penalty
+
+alpha = 1 # Weight for the main penalty
+beta = 0  # Weight for the sparsity penalty
+gamma = 0.1  # Weight for the uniqueness penalty
+loss_function = get_composite_loss(alpha, beta)
+# loss_function = sinkhorn_cosine_loss  # Use the Sinkhorn BCE loss function
+# loss_function = uniqueness_penalty
 
 # Early stopping and learning rate reduction
 best_val_loss = float('inf')

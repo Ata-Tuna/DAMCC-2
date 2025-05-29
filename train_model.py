@@ -78,11 +78,12 @@ def train_model(model, train_loader, val_loader, optimizer, scheduler,
         print(f"Initial validation loss: {initial_val_loss}")
 
         # ✅ Save initial loss as epoch 0
+        best_epoch = 0
         initial_epoch_data = {
             "epoch": 0,
             "train_loss": None,
             "val_loss": initial_val_loss,
-            "best_epoch": 0,
+            "best_epoch": best_epoch,
             "best_val_loss": initial_val_loss
         }
         with open(os.path.join(experiment_dir, 'epoch_losses.json'), 'a') as f:
@@ -110,13 +111,16 @@ def train_model(model, train_loader, val_loader, optimizer, scheduler,
 
                 # Forward pass
                 sampled_b10, sampled_b20 = model(x_0, x_1, x_2, a1, a2, coa2, b1, b2, b10, b20, num_nodes)
-
-                print("ONE FORWARD PASS DONE")
+                # print("ONE FORWARD PASS DONE")
 
                 # Compute loss
-                loss_1 = loss_function(sampled_b10, b10_t)
-                loss_2 = loss_function(sampled_b20, b20_t)
-                loss = (one_cells_weight*loss_1 + (1-one_cells_weight)*loss_2)
+                # loss_1 = loss_function(sampled_b10, b10_t)
+                # loss_2 = loss_function(sampled_b20, b20_t)
+                # loss = (one_cells_weight*loss_1 + (1-one_cells_weight)*loss_2)
+
+                loss = loss_function(sampled_b10, b10_t)
+                print("loss:", loss)
+                # sys.exit()
 
                 if isinstance(loss, torch.Tensor):
                     # Backpropagation
@@ -126,7 +130,7 @@ def train_model(model, train_loader, val_loader, optimizer, scheduler,
                 else:
                     print("Loss is not a tensor; skipping backward pass.")
             
-                print("ONE BACKWARD PASS DONE")
+                # print("ONE BACKWARD PASS DONE")
 
             avg_train_loss = epoch_train_loss / len(train_loader)
             total_train_loss.append(avg_train_loss)
@@ -202,11 +206,23 @@ def validate_model(model, val_loader, loss_function, device, num_nodes, one_cell
             b2 = b2.float()
 
             sampled_b10, sampled_b20 = model(x_0, x_1, x_2, a1, a2, coa2, b1, b2, b10, b20, num_nodes)
+            # if not torch.all((sampled_b10 >= 0) & (sampled_b10 <= 1)):
+            #     print("sampled_b10 contains values outside [0, 1]")
+            #     print("Values below 0:", sampled_b10[sampled_b10 < 0])
+            #     print("Values above 1:", sampled_b10[sampled_b10 > 1])
+            # if not torch.all((b10_t >= 0) & (b10_t <= 1)):
+            #     print("b10_t contains values outside [0, 1]")
+            #     print("Values below 0:", b10_t[b10_t < 0])
+            #     print("Values above 1:", b10_t[b10_t > 1])
 
-            # Compute the loss
-            loss_1 = loss_function(sampled_b10, b10_t)
-            loss_2 = loss_function(sampled_b20, b20_t)
-            loss = (one_cells_weight*loss_1 + (1-one_cells_weight)*loss_2)
+            # Compute loss
+            # loss_1 = loss_function(sampled_b10, b10_t)
+            # loss_2 = loss_function(sampled_b20, b20_t)
+            # loss = (one_cells_weight*loss_1 + (1-one_cells_weight)*loss_2)
+
+            loss = loss_function(sampled_b10, b10_t)
+            # print("loss:", loss)
+            # sys.exit()
 
             # Check if the loss is a tensor (non-empty) or a float (empty tensors handled by returning 0.0)
             if isinstance(loss, torch.Tensor):

@@ -9,11 +9,21 @@ from utils.utils import (incidence_matrix_to_graph,
 from colorama import Fore, Style
 
 ascii_banner_test = f"""
-{Fore.RED}   ■  ▗▞▀▚▖ ▄▄▄  ■         ▐▌▗▞▀▜▌   ■  ▗▞▀▜▌     ▄▄▄ ▗▞▀▜▌▄   ▄ ▗▞▀▚▖   ▐▌
-▗▄▟▙▄▖▐▛▀▀▘▀▄▄▗▄▟▙▄▖       ▐▌▝▚▄▟▌▗▄▟▙▄▖▝▚▄▟▌    ▀▄▄  ▝▚▄▟▌█   █ ▐▛▀▀▘   ▐▌
-  ▐▌  ▝▚▄▄▖▄▄▄▀ ▐▌      ▗▞▀▜▌       ▐▌           ▄▄▄▀       ▀▄▀  ▝▚▄▄▖▗▞▀▜▌
-  ▐▌            ▐▌      ▝▚▄▟▌       ▐▌                                ▝▚▄▟▌
-  ▐▌            ▐▌                  ▐▌                                     
+{Fore.RED}   
+                                                                                                         _______       
+               __.....__                                                .----.     .----.   __.....__    \  ___ `'.    
+           .-''         '.                                               \    \   /    /.-''         '.   ' |--.\  \   
+     .|   /     .-''"'-.  `.            .|                                '   '. /'   //     .-''"'-.  `. | |    \  '  
+   .' |_ /     /________\   \         .' |_                          __   |    |'    //     /________\   \| |     |  ' 
+ .'     ||                  |    _  .'     |                 _    .:--.'. |    ||    ||                  || |     |  | 
+'--.  .-'\    .-------------'  .' |'--.  .-'               .' |  / |   \ |'.   `'   .'\    .-------------'| |     ' .' 
+   |  |   \    '-.____...---. .   | / |  |                .   | /`" __ | | \        /  \    '-.____...---.| |___.' /'  
+   |  |    `.             .'.'.'| |// |  |              .'.'| |// .'.''| |  \      /    `.             .'/_______.'/   
+   |  '.'    `''-...... -'.'.'.-'  /  |  '.'          .'.'.-'  / / /   | |_  '----'       `''-...... -'  \_______|/    
+   |   /                  .'   \_.'   |   /           .'   \_.'  \ \._,\ '/                                            
+   `'-'                               `'-'                        `--'  `"                                             
+
+
 {Style.RESET_ALL}
 """
 
@@ -42,9 +52,19 @@ def test_model(model, num_nodes, test_loader, model_path, save_path, test_graphs
 
                 sampled_b10, sampled_b20 = model(x_0, x_1, x_2, a1, a2, coa2, b1, b2, b10, b20, num_nodes)
 
-                # Remove duplicate rows
-                sampled_b20 = torch.unique(sampled_b20, dim=0)
-                sampled_b10 = torch.unique(sampled_b10, dim=0)
+                # # Remove duplicate rows
+                # sampled_b20 = torch.unique(sampled_b20, dim=0)
+                # sampled_b10 = torch.unique(sampled_b10, dim=0)
+
+                # Set top 2 values per row to 1, others to 0
+                values, indices = torch.topk(sampled_b10, k=2, dim=1)
+                sampled_b10_new = torch.zeros_like(sampled_b10)
+                for i in range(sampled_b10.shape[0]):
+                    sampled_b10_new[i, indices[i]] = 1
+                sampled_b10 = sampled_b10_new.int()
+
+                # Round b20 to nonnegative integers
+                sampled_b20 = torch.clamp(sampled_b20.round(), min=0).int()
 
                 sampled_b10 = sampled_b10.cpu().numpy()
                 sampled_b20 = sampled_b20.cpu().numpy()
@@ -55,9 +75,6 @@ def test_model(model, num_nodes, test_loader, model_path, save_path, test_graphs
                 sampled_graphs.append(incidence_matrix_to_graph(sampled_b10))
                 sampled_ccs.append(generate_cc_from_transposed_incidence(sampled_b10, sampled_b20))
 
-        print("sampled_graphs: ",len(sampled_graphs))
-        print("test_graphs_data: ",len(test_graphs_data[0]))
-        # sys.exit()
         # Remove the first element from each inner list in test_graphs_data
         test_graphs_data = [inner_list[1:] for inner_list in test_graphs_data]
         # bring to the same shape as test data. This chunk is done for evaluation 
@@ -71,7 +88,8 @@ def test_model(model, num_nodes, test_loader, model_path, save_path, test_graphs
         sampled_b20s = divide_tensors(test_graphs_data, sampled_b20_list, sample=True)
         target_b10s = divide_tensors(test_graphs_data, target_b10_list, sample=False)
         target_b20s = divide_tensors(test_graphs_data, target_b20_list, sample=False)
-
+        # test_graphs_data = divide_tensors_into_lists(test_graphs_data, test_graphs_data)
+        
         # Save generated lists
         with open(os.path.join(save_path, 'target_b10s.pkl'), 'wb') as f:
             pickle.dump(target_b10s, f)
@@ -87,6 +105,8 @@ def test_model(model, num_nodes, test_loader, model_path, save_path, test_graphs
             pickle.dump(sampled_graphs, f)
         with open(os.path.join(save_path, 'sampled_ccs.pkl'), 'wb') as f:
             pickle.dump(sampled_ccs, f)
+        with open(os.path.join(save_path, 'target_graphs.pkl'), 'wb') as f:
+            pickle.dump(test_graphs_data, f)
 
         print(ascii_banner_test)
         print(f"Test results saved to {save_path}")
